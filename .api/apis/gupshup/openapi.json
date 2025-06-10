@@ -1,0 +1,184 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sending Text Template",
+    "contact": {},
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.gupshup.io"
+    }
+  ],
+  "paths": {
+    "/wa/api/v1/template/msg": {
+      "post": {
+        "operationId": "Sending Text Template",
+        "parameters": [
+          {
+            "name": "apikey",
+            "in": "header",
+            "description": "Your account API key",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "example": "2xxc4x4xx2c94xxxc2f9xx9d43xxxx8a"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "source",
+                  "destination",
+                  "template"
+                ],
+                "properties": {
+                  "source": {
+                    "type": "string",
+                    "description": "Sender Whatsapp Number",
+                    "example": "919163xxxxx3"
+                  },
+                  "src.name": {
+                    "type": "string",
+                    "description": "App name that the source number belongs to",
+                    "example": "DemoApp"
+                  },
+                  "destination": {
+                    "type": "string",
+                    "description": "Receiver Whatsapp Number",
+                    "example": "917839xxxxx3"
+                  },
+                  "template": {
+                    "type": "object",
+                    "description": "contains template id and list of template parameters",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Template ID",
+                        "example": "template_id"
+                      },
+                      "params": {
+                        "type": "array",
+                        "description": "List of template parameters",
+                        "items": {
+                          "type": "string"
+                        },
+                        "example": [
+                          "hi"
+                        ]
+                      }
+                    }
+                  },
+                  "postbackTexts": {
+                    "type": "array",
+                    "description": "list of objects containing postback text details; include if postback text support required for quick-reply buttons",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "integer",
+                          "description": "button index (0-based)",
+                          "example": 0
+                        },
+                        "text": {
+                          "type": "string",
+                          "description": "postback text for the button",
+                          "example": "hello"
+                        }
+                      }
+                    }
+                  },
+                  "channel": {
+                    "type": "string",
+                    "description": "Messaging Platform Name",
+                    "example": "whatsapp"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "messageId": {
+                      "type": "string",
+                      "description": "message id for the template message sent",
+                      "example": "message id"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "enum": [
+                        "success"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response; in case of bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "error message",
+                      "example": "Invalid Destination"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "enum": [
+                        "error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error response; in case of authentication failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "error message",
+                      "example": "Authentication Failed"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "enum": [
+                        "error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
