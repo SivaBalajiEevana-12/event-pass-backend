@@ -45,29 +45,52 @@ app.post('/api/event',(req,res)=>{
         .then(event => res.status(201).json(event))
         .catch(err => res.status(500).json({ error: err.message }));
 })
-app.post('/api/user', (req, res) =>{
-    const {eventId} = req.query;
+app.post('/api/user', async (req, res) => {
+    const { eventId } = req.query;
     if (!eventId) {
         return res.status(400).json({ error: 'Event ID is required' });
     }
-    const { name, email, phone,location } = req.body;
-    const phonealpha="91"+phone;
+
+    const { name, email, phone, location } = req.body;
     if (!name || !phone) {
         return res.status(400).json({ error: 'Name and phone are required' });
     }
-    const Student = require('./config/student');
-    const newStudent = new Student({ name, email, phone:phonealpha,location });
-    newStudent.save()
-        .then(student => res.status(201))
-        .catch(err => res.status(500));
+
+    try {
+        const phonealpha = "91" + phone;
+
+        const eventsa = await EventPass.findById(eventId);
+        if (!eventsa) return res.status(404).json({ error: "Event not found" });
+
+        const Student = require('./config/student');
+        const newStudent = new Student({ name, email, phone: phonealpha, location });
+        const savedStudent = await newStudent.save();
+
         const Registration = require('./config/registeration');
-    const newRegistration = new Registration({ user: newStudent._id, event: eventId });
-    newRegistration.save()
-        .then(registration => {
-            console.log("Registration successful", newRegistration);
-            res.status(201).json(registration)})
-        .catch(err => res.status(500).json({ error: err.message }));
-})
+        const newRegistration = new Registration({ user: savedStudent._id, event: eventId });
+        const savedRegistration = await newRegistration.save();
+
+        const messageResponse = await gupshup.sendingTextTemplate({
+            template: {
+                id: '6cc5bf4e-8914-4d40-bb5f-e3d46d2d66c8',
+                params: [name, eventsa.title]
+            },
+            'src.name': 'Production',
+            destination: phonealpha,
+            source: '917075176108',
+        }, {
+            apikey: 'zbut4tsg1ouor2jks4umy1d92salxm38'
+        });
+
+        console.log("WhatsApp message sent successfully:", messageResponse.data);
+
+        res.status(201).json(savedRegistration);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/event/:id', async (req, res) => {
     const { id } = req.params;
     const Registration = require('./config/registeration');
