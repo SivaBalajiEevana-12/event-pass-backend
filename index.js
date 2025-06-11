@@ -130,7 +130,8 @@ cron.schedule("* * * * *", async () => {
           try {
             const response = await gupshup.sendingTextTemplate({
               template: {
-                id: '60920254-36ad-426f-9c98-e0bc32b54706',
+                id: 'c2b3766f-c352-4a98-a0be-dcc369b2d8bc',
+                //60920254-36ad-426f-9c98-e0bc32b54706
                 params: [
                   user.name,
                   event.title,
