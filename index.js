@@ -80,6 +80,12 @@ app.post('/api/user', async (req, res) => {
             source: '917075176108',
         }, {
             apikey: 'zbut4tsg1ouor2jks4umy1d92salxm38'
+        })
+        .then((data)=>{
+          console.log(data)
+        })
+        .catch((err)=>{
+          console.error(err)
         });
 
         console.log("WhatsApp message sent successfully:", messageResponse.data);
