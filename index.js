@@ -34,17 +34,48 @@ app.get('/users',(req,res)=>{
 
 //     res.status(200).send("Hi Siva cd Balaji Naidu Eevana")
 // })
-app.post('/api/event',(req,res)=>{
-    const { title, description, date, location, capacity } = req.body;
-    if (!title || !date) {
-        return res.status(400).json({ error: 'Title and date are required' });
-    }
-    const EventPass = require('./config/eventpass');
-    const newEvent = new EventPass({ title, description, date, location, capacity });
-    newEvent.save()
-        .then(event => res.status(201).json(event))
-        .catch(err => res.status(500).json({ error: err.message }));
-})
+// app.post('/api/event',(req,res)=>{
+//     const { title, description, date, location, capacity } = req.body;
+//     if (!title || !date) {
+//         return res.status(400).json({ error: 'Title and date are required' });
+//     }
+//     const EventPass = require('./config/eventpass');
+//     const newEvent = new EventPass({ title, description, date, location, capacity });
+//     newEvent.save()
+//         .then(event => res.status(201).json(event))
+//         .catch(err => res.status(500).json({ error: err.message }));
+// })
+const { DateTime } = require('luxon');
+
+app.post('/api/event', (req, res) => {
+  const { title, description, date, location, capacity } = req.body;
+
+  if (!title || !date) {
+    return res.status(400).json({ error: 'Title and date are required' });
+  }
+
+  let eventDateUTC;
+  try {
+    // Convert local datetime string (from browser) as IST → UTC
+    eventDateUTC = DateTime.fromISO(date, { zone: 'Asia/Kolkata' }).toUTC().toJSDate();
+  } catch (err) {
+    return res.status(400).json({ error: 'Invalid date format' });
+  }
+
+  const EventPass = require('./config/eventpass');
+  const newEvent = new EventPass({
+    title,
+    description,
+    date: eventDateUTC,
+    location,
+    capacity,
+  });
+
+  newEvent.save()
+    .then(event => res.status(201).json(event))
+    .catch(err => res.status(500).json({ error: err.message }));
+});
+
 app.post('/api/user', async (req, res) => {
     const { eventId } = req.query;
     if (!eventId) {
