@@ -7,6 +7,7 @@ const cron = require('node-cron');
 const Registration = require("./config/registeration");
 const EventPass = require("./config/eventpass");
 const gupshup = require('@api/gupshup')
+
 app.use(cors(
     {
         origin: '*',
@@ -182,7 +183,7 @@ cron.schedule("* * * * *", async () => {
       ) {
         const registrations = await Registration.find({ event: event._id }).populate("user");
         console.log(`Sending notifications for event: ${event.title}, to ${registrations.length} users`);
-
+        const eventDateIST = DateTime.fromJSDate(new Date(event.date)).setZone('Asia/Kolkata');
         for (const reg of registrations) {
           const user = reg.user;
 
@@ -194,8 +195,8 @@ cron.schedule("* * * * *", async () => {
                 params: [
                   user.name,
                   event.title,
-                  new Date(event.date).toLocaleDateString(),
-                  new Date(event.date).toLocaleTimeString(),
+                      eventDateIST.toFormat("dd-MM-yyyy"),  // or 'D' for long format
+      eventDateIST.toFormat("hh:mm a"),  
                   event.location
                 ]
               },
