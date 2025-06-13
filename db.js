@@ -1,7 +1,7 @@
 const mongoose=require("mongoose");
 const dbConnect = async () => {
     try {
-        await mongoose.connect(process.env.DATABASE_URI, {
+        await mongoose.connect(process.env.DATABASE_URI||"mongodb+srv://mongotut:mongo124@cluster0.k7ehn.mongodb.net/RAJOR_PAY?retryWrites=true&w=majority&appName=Cluster0", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
