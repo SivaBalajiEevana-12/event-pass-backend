@@ -10,7 +10,9 @@ const gupshup = require('@api/gupshup')
 
 app.use(cors(
     {
-        origin: '*',
+        origin: ["https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-blue.vercel.app","http://localhost:3000",
+          "https://event-pass-git-main-sivabalajieevana-12s-projects.vercel.app","https://event-pass-sivabalajieevana-12s-projects.vercel.app","https://event-pass-chi.vercel.app"
+        ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization']
     }
@@ -190,7 +192,7 @@ cron.schedule("* * * * *", async () => {
           try {
             const response = await gupshup.sendingTextTemplate({
               template: {
-                id: 'c2b3766f-c352-4a98-a0be-dcc369b2d8bc',
+                id: '60920254-36ad-426f-9c98-e0bc32b54706',
                 //60920254-36ad-426f-9c98-e0bc32b54706
                 params: [
                   user.name,
