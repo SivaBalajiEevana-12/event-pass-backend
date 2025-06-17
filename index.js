@@ -11,7 +11,7 @@ const Student=require('./config/student');
 app.use(cors(
     {
         origin: ["https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-blue.vercel.app","http://localhost:3000",
-          "https://event-pass-git-main-sivabalajieevana-12s-projects.vercel.app","https://event-pass-sivabalajieevana-12s-projects.vercel.app","https://event-pass-chi.vercel.app"
+          "https://event-pass-git-main-sivabalajieevana-12s-projects.vercel.app","https://event-pass-sivabalajieevana-12s-projects.vercel.app","https://event-pass-chi.vercel.app","https://admin-panel-iota-nine.vercel.app","https://heritage-form-gxoz.vercel.app"
         ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: ['Content-Type', 'Authorization']
