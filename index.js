@@ -7,7 +7,7 @@ const cron = require('node-cron');
 const Registration = require("./config/registeration");
 const EventPass = require("./config/eventpass");
 const gupshup = require('@api/gupshup')
-
+const Student=require('./config/student');
 app.use(cors(
     {
         origin: ["https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-git-main-hkmvizags-projects.vercel.app","https://event-pass-blue.vercel.app","http://localhost:3000",
@@ -34,6 +34,24 @@ app.get('/users',(req,res)=>{
         .then(registrations => res.status(200).json(registrations))
         .catch(err => res.status(500).json({ error: err.message }));
 })
+// const EventPass = require('./config/eventpass'); // Adjust path if needed
+
+app.delete('/events/:id', async (req, res) => {
+  const eventId = req.params.id;
+
+  try {
+    const deletedEvent = await EventPass.findByIdAndDelete(eventId);
+
+    if (!deletedEvent) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    res.status(200).json({ message: 'Event deleted successfully', deletedEvent });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 //     res.status(200).send("Hi Siva cd Balaji Naidu Eevana")
 // })
@@ -218,6 +236,102 @@ cron.schedule("* * * * *", async () => {
     }
   } catch (error) {
     console.error("Error in notification scheduler:", error);
+  }
+});
+app.get('/event-registrations', async (req, res) => {
+  try {
+    const result = await Registration.aggregate([
+      {
+        $lookup: {
+          from: 'eventpasses', // Collection name from EventPass model
+          localField: 'event',
+          foreignField: '_id',
+          as: 'eventDetails'
+        }
+      },
+      { $unwind: '$eventDetails' },
+      {
+        $lookup: {
+          from: 'students', // Collection name from Student model
+          localField: 'user',
+          foreignField: '_id',
+          as: 'studentDetails'
+        }
+      },
+      { $unwind: '$studentDetails' },
+      {
+        $group: {
+          _id: '$eventDetails._id',
+          eventTitle: { $first: '$eventDetails.title' },
+          students: {
+            $push: {
+              name: '$studentDetails.name',
+              email: '$studentDetails.email',
+              phone: '$studentDetails.phone',
+              location: '$studentDetails.location'
+            }
+          }
+        }
+      }
+    ]);
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+const mongoose=require('mongoose');
+app.get('/event-registrations/:eventId', async (req, res) => {
+  const eventId = req.params.eventId;
+
+  try {
+    const result = await Registration.aggregate([
+      {
+        $match: {
+          event: new mongoose.Types.ObjectId(eventId)
+        }
+      },
+      {
+        $lookup: {
+          from: 'eventpasses',
+          localField: 'event',
+          foreignField: '_id',
+          as: 'eventDetails'
+        }
+      },
+      { $unwind: '$eventDetails' },
+      {
+        $lookup: {
+          from: 'students',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'studentDetails'
+        }
+      },
+      { $unwind: '$studentDetails' },
+      {
+        $group: {
+          _id: '$eventDetails._id',
+          eventTitle: { $first: '$eventDetails.title' },
+          students: {
+            $push: {
+              name: '$studentDetails.name',
+              email: '$studentDetails.email',
+              phone: '$studentDetails.phone',
+              location: '$studentDetails.location'
+            }
+          }
+        }
+      }
+    ]);
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'No registrations found for this event' });
+    }
+
+    res.status(200).json(result[0]); // send just the single event group
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
